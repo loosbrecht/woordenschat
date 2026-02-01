@@ -1,18 +1,27 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import WordCard from '../components/WordCard.astro';
-import { getToday, getWordForDate, formatDisplayDate, addDays } from '../lib/words';
+import { getToday, getWordForDate, formatDisplayDate, getPrevDate } from '../lib/words';
 
+const db = Astro.locals.runtime.env.DB;
 const today = getToday();
-const word = getWordForDate(today);
+const word = await getWordForDate(db, today);
 const displayDate = formatDisplayDate(today);
-const yesterday = addDays(today, -1);
+const prevDate = await getPrevDate(db, today);
 ---
 
 <Layout>
-  <WordCard word={word} date={today} displayDate={displayDate} />
+  {word ? (
+    <WordCard word={word} date={today} displayDate={displayDate} />
+  ) : (
+    <article class="word-card">
+      <p class="word-date">{displayDate}</p>
+      <h1 class="word-title">Geen woord vandaag</h1>
+      <p class="word-explanation">Er is nog geen woord voor vandaag toegevoegd.</p>
+    </article>
+  )}
   <nav class="word-nav">
-    <a href={`/archive/${yesterday}`}>&larr; Gisteren</a>
+    {prevDate && <a href={`/archive/${prevDate}`}>&larr; Vorige</a>}
     <a href="/archive">Archief &rarr;</a>
   </nav>
 </Layout>

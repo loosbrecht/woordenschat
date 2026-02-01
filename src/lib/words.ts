@@ -1,17 +1,12 @@
-import words from '../data/words.json';
-
 export interface Word {
   word: string;
   explanation: string;
   example: string;
 }
 
-function djb2(str: string): number {
-  let hash = 5381;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash * 33) ^ str.charCodeAt(i);
-  }
-  return hash >>> 0;
+export interface WordRow extends Word {
+  id: number;
+  date: string;
 }
 
 export function formatDate(date: Date): string {
@@ -36,30 +31,8 @@ export function parseDate(dateStr: string): Date | null {
   return date;
 }
 
-export function getWordForDate(dateStr: string): Word {
-  const index = djb2(dateStr) % words.length;
-  return words[index] as Word;
-}
-
 export function getToday(): string {
   return formatDate(new Date());
-}
-
-export function addDays(dateStr: string, days: number): string {
-  const date = parseDate(dateStr)!;
-  date.setDate(date.getDate() + days);
-  return formatDate(date);
-}
-
-export function getRecentDates(count: number): string[] {
-  const today = new Date();
-  const dates: string[] = [];
-  for (let i = 0; i < count; i++) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    dates.push(formatDate(d));
-  }
-  return dates;
 }
 
 export function formatDisplayDate(dateStr: string): string {
@@ -83,4 +56,37 @@ export function isFutureDate(dateStr: string): boolean {
 
 export function isToday(dateStr: string): boolean {
   return dateStr === getToday();
+}
+
+export async function getWordForDate(db: D1Database, dateStr: string): Promise<WordRow | null> {
+  return await db
+    .prepare('SELECT * FROM words WHERE date = ? LIMIT 1')
+    .bind(dateStr)
+    .first<WordRow>();
+}
+
+export async function getRecentWords(db: D1Database, count: number): Promise<WordRow[]> {
+  const today = getToday();
+  const { results } = await db
+    .prepare('SELECT * FROM words WHERE date <= ? ORDER BY date DESC LIMIT ?')
+    .bind(today, count)
+    .all<WordRow>();
+  return results;
+}
+
+export async function getPrevDate(db: D1Database, dateStr: string): Promise<string | null> {
+  const row = await db
+    .prepare('SELECT date FROM words WHERE date < ? ORDER BY date DESC LIMIT 1')
+    .bind(dateStr)
+    .first<{ date: string }>();
+  return row?.date ?? null;
+}
+
+export async function getNextDate(db: D1Database, dateStr: string): Promise<string | null> {
+  const today = getToday();
+  const row = await db
+    .prepare('SELECT date FROM words WHERE date > ? AND date <= ? ORDER BY date ASC LIMIT 1')
+    .bind(dateStr, today)
+    .first<{ date: string }>();
+  return row?.date ?? null;
 }

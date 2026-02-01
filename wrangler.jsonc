@@ -5,5 +5,12 @@
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
     "enabled": true
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "woordenschat",
+      "database_id": "woordenschat"
+    }
+  ]
 }

@@ -5,7 +5,8 @@ import {
   parseDate,
   getWordForDate,
   formatDisplayDate,
-  addDays,
+  getPrevDate,
+  getNextDate,
   isFutureDate,
   isToday,
 } from '../../lib/words';
@@ -24,21 +25,29 @@ if (isToday(date)) {
   return Astro.redirect('/');
 }
 
-const word = getWordForDate(date);
+const db = Astro.locals.runtime.env.DB;
+const word = await getWordForDate(db, date);
+
+if (!word) {
+  return Astro.redirect('/');
+}
+
 const displayDate = formatDisplayDate(date);
-const prevDate = addDays(date, -1);
-const nextDate = addDays(date, 1);
-const nextIsToday = isToday(nextDate);
+const prevDate = await getPrevDate(db, date);
+const nextDate = await getNextDate(db, date);
+const nextIsToday = nextDate !== null && isToday(nextDate);
 ---
 
 <Layout title={`${word.word} — Woordenschat`}>
   <WordCard word={word} date={date} displayDate={displayDate} />
   <nav class="word-nav">
-    <a href={`/archive/${prevDate}`}>&larr; Vorige dag</a>
-    {nextIsToday ? (
-      <a href="/">Vandaag &rarr;</a>
-    ) : (
-      <a href={`/archive/${nextDate}`}>Volgende dag &rarr;</a>
+    {prevDate && <a href={`/archive/${prevDate}`}>&larr; Vorige</a>}
+    {nextDate && (
+      nextIsToday ? (
+        <a href="/">Vandaag &rarr;</a>
+      ) : (
+        <a href={`/archive/${nextDate}`}>Volgende &rarr;</a>
+      )
     )}
   </nav>
 </Layout>
