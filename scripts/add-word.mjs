@@ -111,17 +111,17 @@ async function generateWord(openai, existingWords) {
     messages: [
       {
         role: 'system',
-        content: `Je bent een expert in de Nederlandse taal. Genereer een interessant, minder bekend maar bruikbaar Nederlands woord met uitleg en voorbeeldzin. Het woord moet echt bestaan, mooi zijn, en iemands woordenschat verrijken.
+        content: `Je bent een expert in het Vlaams (Belgisch-Nederlands). Genereer een interessant, minder bekend maar bruikbaar Vlaams woord met uitleg en voorbeeldzin. Het woord moet echt bestaan, mooi zijn, en iemands woordenschat verrijken. Het mag een typisch Vlaams woord zijn, een woord uit het Belgisch-Nederlands, of een woord dat vooral in Vlaanderen gebruikt wordt.
 
 Vermijd deze woorden die al bestaan in de lijst: ${wordList}
 
 Antwoord in JSON-formaat: { "word": "...", "explanation": "...", "example": "..." }
-- "explanation": een heldere uitleg van het woord in het Nederlands
-- "example": een voorbeeldzin die het woord correct gebruikt`,
+- "explanation": een heldere uitleg van het woord in het Vlaams/Belgisch-Nederlands
+- "example": een voorbeeldzin in het Vlaams die het woord correct gebruikt`,
       },
       {
         role: 'user',
-        content: 'Genereer een mooi Nederlands woord.',
+        content: 'Genereer een mooi Vlaams woord.',
       },
     ],
   });
@@ -136,10 +136,10 @@ async function verifyWord(openai, word) {
     messages: [
       {
         role: 'system',
-        content: `Je bent een strenge taalkundige die Nederlandse woorden controleert op juistheid.
+        content: `Je bent een strenge taalkundige met expertise in het Vlaams (Belgisch-Nederlands) die woorden controleert op juistheid.
 
 Je krijgt een woord, uitleg en voorbeeldzin. Controleer:
-1. Is dit een echt Nederlands woord?
+1. Is dit een echt woord dat in het Vlaams/Belgisch-Nederlands gebruikt wordt?
 2. Is de uitleg accuraat?
 3. Is de voorbeeldzin grammaticaal correct en wordt het woord juist gebruikt?
 
