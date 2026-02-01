@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-"Woord van de Dag" — a Dutch vocabulary app that shows one new Dutch word per day with its explanation and example sentence. Built with Astro (SSR mode) and deployed to Cloudflare Pages.
+"Woordenschat" — a Dutch vocabulary app that shows one new Dutch word per day with its explanation and example sentence. Built with Astro (SSR mode) and deployed to Cloudflare Pages.
 
 ## Commands
 

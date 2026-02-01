@@ -5,7 +5,7 @@ interface Props {
   title?: string;
 }
 
-const { title = 'Woord van de Dag' } = Astro.props;
+const { title = 'Woordenschat' } = Astro.props;
 ---
 
 <!doctype html>
@@ -20,7 +20,7 @@ const { title = 'Woord van de Dag' } = Astro.props;
   <body>
     <header class="site-header">
       <nav>
-        <a href="/" class="site-title">Woord van de Dag</a>
+        <a href="/" class="site-title">Woordenschat</a>
         <a href="/archive" class="nav-link">Archief</a>
       </nav>
     </header>
@@ -28,7 +28,7 @@ const { title = 'Woord van de Dag' } = Astro.props;
       <slot />
     </main>
     <footer class="site-footer">
-      <p>Woord van de Dag &mdash; Elke dag een nieuw Nederlands woord</p>
+      <p>Woordenschat &mdash; Elke dag een nieuw Nederlands woord</p>
     </footer>
   </body>
 </html>
