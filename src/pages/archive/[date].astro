@@ -9,12 +9,7 @@ import {
   getNextDate,
   isFutureDate,
   isToday,
-  getRecentWords,
 } from '../../lib/words';
-
-export function getStaticPaths() {
-  return getRecentWords(Infinity).map(({ date }) => ({ params: { date } }));
-}
 
 const { date } = Astro.params;
 
