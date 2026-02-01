@@ -37,6 +37,33 @@ All commands are run from the root of the project, from a terminal:
 | `npm run preview`         | Preview your build locally, before deploying     |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
+| `npm run add-word`        | Add a new word to `words.json` (see below)       |
+
+## Adding Words
+
+Use the `add-word` script to add new entries to `src/data/words.json`. Dates are assigned automatically (next day after the last entry).
+
+**Manual mode** — prompts for word, explanation, and example:
+
+```bash
+npm run add-word                          # add 1 word interactively
+npm run add-word -- --days 5              # add 5 words interactively
+```
+
+**AI mode** — uses OpenAI to generate and independently verify words:
+
+```bash
+npm run add-word -- --ai                  # generate 1 word
+npm run add-word -- --ai --validate       # generate 1 word, approve before saving
+npm run add-word -- --ai --days 30        # batch generate 30 words
+npm run add-word -- --ai --days 30 --validate  # batch generate, approve each
+```
+
+AI mode requires an `OPENAI_API_KEY` environment variable. Set it in a `.env` file at the project root:
+
+```
+OPENAI_API_KEY=sk-...
+```
 
 ## 👀 Want to learn more?
 

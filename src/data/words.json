@@ -1,5 +1,5 @@
 [
-   {
+  {
     "date": "2026-01-30",
     "word": "ochtendgloren",
     "explanation": "Het eerste licht van de dag, wanneer de hemel langzaam oplicht bij zonsopkomst.",
@@ -58,5 +58,11 @@
     "word": "ijsbloemen",
     "explanation": "De sierlijke, bloemachtige ijskristallen die zich bij vriesweer op ramen vormen.",
     "example": "Op koude winterochtenden verschenen er prachtige ijsbloemen op het slaapkamerraam."
+  },
+  {
+    "date": "2026-02-09",
+    "word": "zielenrust",
+    "explanation": "Zielenrust verwijst naar een diepere staat van innerlijke vrede en geestelijke kalmte, vaak gekenmerkt door het ontbreken van zorgen en het ervaren van harmonie met zichzelf en de omgeving.",
+    "example": "Na een lange wandeling in de natuur voelde ze een prachtige zielenrust die haar hielp om de drukte van het dagelijks leven even te vergeten."
   }
 ]
