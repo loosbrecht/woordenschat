@@ -7,7 +7,14 @@
       "Bash(npx wrangler:*)",
       "Bash(git -C /Users/brechtloos/dev/git/woordenschat add .gitignore CLAUDE.md astro.config.mjs package.json package-lock.json src/lib/words.ts src/pages/index.astro src/pages/archive/index.astro \"src/pages/archive/[date].astro\" src/data/words.json migrations/0001_create_words_table.sql src/env.d.ts wrangler.jsonc)",
       "Bash(git -C /Users/brechtloos/dev/git/woordenschat commit -m \"$\\(cat <<''EOF''\nRemove Cloudflare, use static JSON with date-based lookup\n\nReplace D1 database with a static words.json that has explicit date\nfields. Remove Cloudflare adapter, wrangler config, migrations, and\nenv types. Site now builds as plain static Astro.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(npm run build:*)",
+      "Bash(git -C /Users/brechtloos/dev/git/woordenschat add package.json package-lock.json src/styles/global.css src/pages/api/generate-word.ts src/pages/api/commit-words.ts src/pages/nieuwewoorden.astro)",
+      "Bash(git -C /Users/brechtloos/dev/git/woordenschat status)",
+      "Bash(git -C /Users/brechtloos/dev/git/woordenschat diff)",
+      "Bash(git -C /Users/brechtloos/dev/git/woordenschat log --oneline -3)",
+      "Bash(git -C /Users/brechtloos/dev/git/woordenschat add src/pages/nieuwewoorden.astro)",
+      "Bash(git -C /Users/brechtloos/dev/git/woordenschat commit -m \"$\\(cat <<''EOF''\nFix XSS vulnerability in word generation page\n\nReplace innerHTML with DOM API \\(createElement + textContent\\) to prevent\ninjection of unsanitized OpenAI responses into the page.\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
