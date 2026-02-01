@@ -70,27 +70,39 @@ const lastDate = [...words].sort((a, b) => a.date.localeCompare(b.date)).at(-1)?
       el.style.display = 'none';
     }
 
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text) node.textContent = text;
+      return node;
+    }
+
     function renderResults() {
       resultsListEl.innerHTML = '';
       generatedWords.forEach((item, i) => {
-        const card = document.createElement('div');
-        card.className = 'gen-result-card';
+        const card = el('div', 'gen-result-card');
 
         const valid = item.verification?.valid;
-        const statusClass = valid ? 'gen-valid' : 'gen-invalid';
-        const statusText = valid ? 'Geldig' : 'Ongeldig';
 
-        card.innerHTML = `
-          <label class="gen-result-header">
-            <input type="checkbox" class="gen-checkbox" data-index="${i}" ${valid ? 'checked' : ''} />
-            <span class="gen-result-word">${item.word}</span>
-            <span class="gen-result-date">${item.date}</span>
-            <span class="gen-result-status ${statusClass}">${statusText}</span>
-          </label>
-          <p class="gen-result-explanation">${item.explanation}</p>
-          <p class="gen-result-example">${item.example}</p>
-          ${item.verification?.reason ? `<p class="gen-result-reason">${item.verification.reason}</p>` : ''}
-        `;
+        const label = el('label', 'gen-result-header');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'gen-checkbox';
+        checkbox.dataset.index = i;
+        if (valid) checkbox.checked = true;
+        label.appendChild(checkbox);
+        label.appendChild(el('span', 'gen-result-word', item.word));
+        label.appendChild(el('span', 'gen-result-date', item.date));
+        label.appendChild(el('span', `gen-result-status ${valid ? 'gen-valid' : 'gen-invalid'}`, valid ? 'Geldig' : 'Ongeldig'));
+        card.appendChild(label);
+
+        card.appendChild(el('p', 'gen-result-explanation', item.explanation));
+        card.appendChild(el('p', 'gen-result-example', item.example));
+
+        if (item.verification?.reason) {
+          card.appendChild(el('p', 'gen-result-reason', item.verification.reason));
+        }
+
         resultsListEl.appendChild(card);
       });
 
