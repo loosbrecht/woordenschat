@@ -1,5 +1,10 @@
 [
-  
+   {
+    "date": "2026-01-30",
+    "word": "ochtendgloren",
+    "explanation": "Het eerste licht van de dag, wanneer de hemel langzaam oplicht bij zonsopkomst.",
+    "example": "Ze stond vroeg op om het ochtendgloren boven de zee te aanschouwen."
+  },
   {
     "date": "2026-01-31",
     "word": "heimwee",
@@ -53,11 +58,5 @@
     "word": "ijsbloemen",
     "explanation": "De sierlijke, bloemachtige ijskristallen die zich bij vriesweer op ramen vormen.",
     "example": "Op koude winterochtenden verschenen er prachtige ijsbloemen op het slaapkamerraam."
-  },
-  {
-    "date": "2026-02-09",
-    "word": "ochtendgloren",
-    "explanation": "Het eerste licht van de dag, wanneer de hemel langzaam oplicht bij zonsopkomst.",
-    "example": "Ze stond vroeg op om het ochtendgloren boven de zee te aanschouwen."
   }
 ]
