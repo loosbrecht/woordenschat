@@ -3,11 +3,10 @@ import Layout from '../layouts/Layout.astro';
 import WordCard from '../components/WordCard.astro';
 import { getToday, getWordForDate, formatDisplayDate, getPrevDate } from '../lib/words';
 
-const db = Astro.locals.runtime.env.DB;
 const today = getToday();
-const word = await getWordForDate(db, today);
+const word = getWordForDate(today);
 const displayDate = formatDisplayDate(today);
-const prevDate = await getPrevDate(db, today);
+const prevDate = getPrevDate(today);
 ---
 
 <Layout>

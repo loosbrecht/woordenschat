@@ -9,7 +9,12 @@ import {
   getNextDate,
   isFutureDate,
   isToday,
+  getRecentWords,
 } from '../../lib/words';
+
+export function getStaticPaths() {
+  return getRecentWords(Infinity).map(({ date }) => ({ params: { date } }));
+}
 
 const { date } = Astro.params;
 
@@ -25,16 +30,15 @@ if (isToday(date)) {
   return Astro.redirect('/');
 }
 
-const db = Astro.locals.runtime.env.DB;
-const word = await getWordForDate(db, date);
+const word = getWordForDate(date);
 
 if (!word) {
   return Astro.redirect('/');
 }
 
 const displayDate = formatDisplayDate(date);
-const prevDate = await getPrevDate(db, date);
-const nextDate = await getNextDate(db, date);
+const prevDate = getPrevDate(date);
+const nextDate = getNextDate(date);
 const nextIsToday = nextDate !== null && isToday(nextDate);
 ---
 

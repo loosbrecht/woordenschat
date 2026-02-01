@@ -1,13 +1,16 @@
+import words from '../data/words.json';
+
 export interface Word {
   word: string;
   explanation: string;
   example: string;
 }
 
-export interface WordRow extends Word {
-  id: number;
+export interface WordEntry extends Word {
   date: string;
 }
+
+const entries = words as WordEntry[];
 
 export function formatDate(date: Date): string {
   const y = date.getFullYear();
@@ -58,35 +61,29 @@ export function isToday(dateStr: string): boolean {
   return dateStr === getToday();
 }
 
-export async function getWordForDate(db: D1Database, dateStr: string): Promise<WordRow | null> {
-  return await db
-    .prepare('SELECT * FROM words WHERE date = ? LIMIT 1')
-    .bind(dateStr)
-    .first<WordRow>();
+export function getWordForDate(dateStr: string): WordEntry | null {
+  return entries.find((e) => e.date === dateStr) ?? null;
 }
 
-export async function getRecentWords(db: D1Database, count: number): Promise<WordRow[]> {
+export function getRecentWords(count: number): WordEntry[] {
   const today = getToday();
-  const { results } = await db
-    .prepare('SELECT * FROM words WHERE date <= ? ORDER BY date DESC LIMIT ?')
-    .bind(today, count)
-    .all<WordRow>();
-  return results;
+  return entries
+    .filter((e) => e.date <= today)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, count);
 }
 
-export async function getPrevDate(db: D1Database, dateStr: string): Promise<string | null> {
-  const row = await db
-    .prepare('SELECT date FROM words WHERE date < ? ORDER BY date DESC LIMIT 1')
-    .bind(dateStr)
-    .first<{ date: string }>();
-  return row?.date ?? null;
+export function getPrevDate(dateStr: string): string | null {
+  const prev = entries
+    .filter((e) => e.date < dateStr)
+    .sort((a, b) => b.date.localeCompare(a.date));
+  return prev[0]?.date ?? null;
 }
 
-export async function getNextDate(db: D1Database, dateStr: string): Promise<string | null> {
+export function getNextDate(dateStr: string): string | null {
   const today = getToday();
-  const row = await db
-    .prepare('SELECT date FROM words WHERE date > ? AND date <= ? ORDER BY date ASC LIMIT 1')
-    .bind(dateStr, today)
-    .first<{ date: string }>();
-  return row?.date ?? null;
+  const next = entries
+    .filter((e) => e.date > dateStr && e.date <= today)
+    .sort((a, b) => a.date.localeCompare(b.date));
+  return next[0]?.date ?? null;
 }

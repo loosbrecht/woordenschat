@@ -2,8 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { getRecentWords, formatDisplayDate } from '../../lib/words';
 
-const db = Astro.locals.runtime.env.DB;
-const words = await getRecentWords(db, 10);
+const words = getRecentWords(10);
 ---
 
 <Layout title="Archief — Woordenschat">
