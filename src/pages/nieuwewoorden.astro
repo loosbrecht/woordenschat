@@ -1,0 +1,218 @@
+---
+import Layout from '../layouts/Layout.astro';
+import words from '../data/words.json';
+
+const existingWordNames = words.map((w) => w.word);
+const lastDate = [...words].sort((a, b) => a.date.localeCompare(b.date)).at(-1)?.date ?? '';
+---
+
+<Layout title="Nieuwe woorden — Woordenschat">
+  <h1 class="page-heading">Nieuwe woorden genereren</h1>
+
+  <div class="gen-form" id="gen-form">
+    <label class="gen-label">
+      Wachtwoord
+      <input type="password" id="secret" class="gen-input" autocomplete="off" />
+    </label>
+
+    <label class="gen-label">
+      Aantal woorden
+      <select id="count" class="gen-input">
+        {Array.from({ length: 30 }, (_, i) => (
+          <option value={i + 1}>{i + 1}</option>
+        ))}
+      </select>
+    </label>
+
+    <button id="generate-btn" class="gen-btn">Genereer</button>
+  </div>
+
+  <div id="status" class="gen-status" style="display:none;"></div>
+
+  <div id="results" class="gen-results" style="display:none;">
+    <h2 class="gen-results-heading">Gegenereerde woorden</h2>
+    <div id="results-list"></div>
+
+    <div id="save-section" style="display:none;">
+      <button id="save-btn" class="gen-btn gen-btn-save">Opslaan naar GitHub</button>
+    </div>
+  </div>
+
+  <div id="save-status" class="gen-status" style="display:none;"></div>
+
+  <script define:vars={{ existingWordNames, lastDate }}>
+    const secretInput = document.getElementById('secret');
+    const countSelect = document.getElementById('count');
+    const generateBtn = document.getElementById('generate-btn');
+    const statusEl = document.getElementById('status');
+    const resultsEl = document.getElementById('results');
+    const resultsListEl = document.getElementById('results-list');
+    const saveSectionEl = document.getElementById('save-section');
+    const saveBtn = document.getElementById('save-btn');
+    const saveStatusEl = document.getElementById('save-status');
+
+    let generatedWords = [];
+    let allExistingWords = [...existingWordNames];
+
+    function addDays(dateStr, n) {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const date = new Date(y, m - 1, d + n);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    function showStatus(el, message, type = 'info') {
+      el.textContent = message;
+      el.className = `gen-status gen-status-${type}`;
+      el.style.display = 'block';
+    }
+
+    function hideStatus(el) {
+      el.style.display = 'none';
+    }
+
+    function renderResults() {
+      resultsListEl.innerHTML = '';
+      generatedWords.forEach((item, i) => {
+        const card = document.createElement('div');
+        card.className = 'gen-result-card';
+
+        const valid = item.verification?.valid;
+        const statusClass = valid ? 'gen-valid' : 'gen-invalid';
+        const statusText = valid ? 'Geldig' : 'Ongeldig';
+
+        card.innerHTML = `
+          <label class="gen-result-header">
+            <input type="checkbox" class="gen-checkbox" data-index="${i}" ${valid ? 'checked' : ''} />
+            <span class="gen-result-word">${item.word}</span>
+            <span class="gen-result-date">${item.date}</span>
+            <span class="gen-result-status ${statusClass}">${statusText}</span>
+          </label>
+          <p class="gen-result-explanation">${item.explanation}</p>
+          <p class="gen-result-example">${item.example}</p>
+          ${item.verification?.reason ? `<p class="gen-result-reason">${item.verification.reason}</p>` : ''}
+        `;
+        resultsListEl.appendChild(card);
+      });
+
+      resultsEl.style.display = generatedWords.length > 0 ? 'block' : 'none';
+      saveSectionEl.style.display = generatedWords.length > 0 ? 'block' : 'none';
+    }
+
+    generateBtn.addEventListener('click', async () => {
+      const secret = secretInput.value.trim();
+      if (!secret) {
+        showStatus(statusEl, 'Voer een wachtwoord in.', 'error');
+        return;
+      }
+
+      const count = parseInt(countSelect.value, 10);
+      generatedWords = [];
+      renderResults();
+      hideStatus(saveStatusEl);
+
+      generateBtn.disabled = true;
+
+      let nextDate = lastDate;
+
+      for (let i = 0; i < count; i++) {
+        nextDate = addDays(nextDate, 1);
+
+        // Skip dates that already have a word
+        while (allExistingWords.length > 0 && false) {
+          nextDate = addDays(nextDate, 1);
+        }
+
+        showStatus(statusEl, `Woord ${i + 1} van ${count} genereren voor ${nextDate}...`);
+
+        try {
+          const res = await fetch('/api/generate-word', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ secret, existingWords: allExistingWords }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            showStatus(statusEl, data.error || 'Fout bij genereren.', 'error');
+            generateBtn.disabled = false;
+            return;
+          }
+
+          const entry = {
+            date: nextDate,
+            word: data.word,
+            explanation: data.explanation,
+            example: data.example,
+            verification: data.verification,
+          };
+
+          generatedWords.push(entry);
+          allExistingWords.push(data.word);
+          renderResults();
+        } catch (err) {
+          showStatus(statusEl, `Fout: ${err.message}`, 'error');
+          generateBtn.disabled = false;
+          return;
+        }
+      }
+
+      showStatus(statusEl, `${generatedWords.length} woord${generatedWords.length !== 1 ? 'en' : ''} gegenereerd.`, 'success');
+      generateBtn.disabled = false;
+    });
+
+    saveBtn.addEventListener('click', async () => {
+      const secret = secretInput.value.trim();
+      if (!secret) {
+        showStatus(saveStatusEl, 'Voer een wachtwoord in.', 'error');
+        return;
+      }
+
+      // Get checked words
+      const checkboxes = resultsListEl.querySelectorAll('.gen-checkbox');
+      const approvedWords = [];
+      checkboxes.forEach((cb) => {
+        if (cb.checked) {
+          const idx = parseInt(cb.dataset.index, 10);
+          const w = generatedWords[idx];
+          approvedWords.push({
+            date: w.date,
+            word: w.word,
+            explanation: w.explanation,
+            example: w.example,
+          });
+        }
+      });
+
+      if (approvedWords.length === 0) {
+        showStatus(saveStatusEl, 'Selecteer minstens een woord om op te slaan.', 'error');
+        return;
+      }
+
+      saveBtn.disabled = true;
+      showStatus(saveStatusEl, `${approvedWords.length} woord${approvedWords.length !== 1 ? 'en' : ''} opslaan...`);
+
+      try {
+        const res = await fetch('/api/commit-words', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ secret, words: approvedWords }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showStatus(saveStatusEl, data.error || 'Fout bij opslaan.', 'error');
+          saveBtn.disabled = false;
+          return;
+        }
+
+        showStatus(saveStatusEl, `${data.message} De site wordt automatisch opnieuw gebouwd.`, 'success');
+        saveBtn.disabled = false;
+      } catch (err) {
+        showStatus(saveStatusEl, `Fout: ${err.message}`, 'error');
+        saveBtn.disabled = false;
+      }
+    });
+  </script>
+</Layout>
