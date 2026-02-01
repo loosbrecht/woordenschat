@@ -1,0 +1,44 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import WordCard from '../../components/WordCard.astro';
+import {
+  parseDate,
+  getWordForDate,
+  formatDisplayDate,
+  addDays,
+  isFutureDate,
+  isToday,
+} from '../../lib/words';
+
+const { date } = Astro.params;
+
+if (!date || !parseDate(date)) {
+  return Astro.redirect('/');
+}
+
+if (isFutureDate(date)) {
+  return Astro.redirect('/');
+}
+
+if (isToday(date)) {
+  return Astro.redirect('/');
+}
+
+const word = getWordForDate(date);
+const displayDate = formatDisplayDate(date);
+const prevDate = addDays(date, -1);
+const nextDate = addDays(date, 1);
+const nextIsToday = isToday(nextDate);
+---
+
+<Layout title={`${word.word} — Woord van de Dag`}>
+  <WordCard word={word} date={date} displayDate={displayDate} />
+  <nav class="word-nav">
+    <a href={`/archive/${prevDate}`}>&larr; Vorige dag</a>
+    {nextIsToday ? (
+      <a href="/">Vandaag &rarr;</a>
+    ) : (
+      <a href={`/archive/${nextDate}`}>Volgende dag &rarr;</a>
+    )}
+  </nav>
+</Layout>

@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import WordCard from '../components/WordCard.astro';
+import { getToday, getWordForDate, formatDisplayDate, addDays } from '../lib/words';
+
+const today = getToday();
+const word = getWordForDate(today);
+const displayDate = formatDisplayDate(today);
+const yesterday = addDays(today, -1);
+---
+
+<Layout>
+  <WordCard word={word} date={today} displayDate={displayDate} />
+  <nav class="word-nav">
+    <a href={`/archive/${yesterday}`}>&larr; Gisteren</a>
+    <a href="/archive">Archief &rarr;</a>
+  </nav>
+</Layout>

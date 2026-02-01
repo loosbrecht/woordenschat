@@ -1,0 +1,17 @@
+{
+  "name": "word-of-the-day",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "cf:preview": "npm run build && npx wrangler pages dev",
+    "cf:deploy": "npm run build && npx wrangler pages deploy"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^12.6.12",
+    "astro": "^5.17.1"
+  }
+}

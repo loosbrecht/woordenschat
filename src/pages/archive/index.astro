@@ -1,0 +1,25 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getRecentDates, getWordForDate, formatDisplayDate } from '../../lib/words';
+
+const dates = getRecentDates(10);
+const entries = dates.map((date) => ({
+  date,
+  word: getWordForDate(date),
+  displayDate: formatDisplayDate(date),
+}));
+---
+
+<Layout title="Archief — Woord van de Dag">
+  <h1 class="page-heading">Archief</h1>
+  <ul class="archive-list">
+    {entries.map(({ date, word, displayDate }) => (
+      <li>
+        <a href={`/archive/${date}`} class="archive-item">
+          <span class="archive-word">{word.word}</span>
+          <span class="archive-date">{displayDate}</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Layout>

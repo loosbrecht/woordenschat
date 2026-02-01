@@ -1,0 +1,9 @@
+{
+  "name": "word-of-the-day",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-02-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  }
+}

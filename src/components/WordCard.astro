@@ -1,0 +1,20 @@
+---
+import type { Word } from '../lib/words';
+
+interface Props {
+  word: Word;
+  date: string;
+  displayDate: string;
+}
+
+const { word, date, displayDate } = Astro.props;
+---
+
+<article class="word-card">
+  <p class="word-date">{displayDate}</p>
+  <h1 class="word-title">{word.word}</h1>
+  <p class="word-explanation">{word.explanation}</p>
+  <blockquote class="word-example">
+    &ldquo;{word.example}&rdquo;
+  </blockquote>
+</article>
