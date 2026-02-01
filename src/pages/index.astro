@@ -19,8 +19,9 @@ const prevDate = getPrevDate(today);
       <p class="word-explanation">Er is nog geen woord voor vandaag toegevoegd.</p>
     </article>
   )}
-  <nav class="word-nav">
-    {prevDate && <a href={`/archive/${prevDate}`}>&larr; Vorige</a>}
-    <a href="/archive">Archief &rarr;</a>
-  </nav>
+  {prevDate && (
+    <nav class="word-nav">
+      <a href={`/archive/${prevDate}`}>&larr; Vorige</a>
+    </nav>
+  )}
 </Layout>

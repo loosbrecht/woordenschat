@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import WordCard from '../../components/WordCard.astro';
 import {
-  parseDate,
+  isValidDate,
   getWordForDate,
   formatDisplayDate,
   getPrevDate,
@@ -13,7 +13,7 @@ import {
 
 const { date } = Astro.params;
 
-if (!date || !parseDate(date)) {
+if (!date || !isValidDate(date)) {
   return Astro.redirect('/');
 }
 
@@ -43,9 +43,9 @@ const nextIsToday = nextDate !== null && isToday(nextDate);
     {prevDate && <a href={`/archive/${prevDate}`}>&larr; Vorige</a>}
     {nextDate && (
       nextIsToday ? (
-        <a href="/">Vandaag &rarr;</a>
+        <a href="/" style="margin-left:auto">Vandaag &rarr;</a>
       ) : (
-        <a href={`/archive/${nextDate}`}>Volgende &rarr;</a>
+        <a href={`/archive/${nextDate}`} style="margin-left:auto">Volgende &rarr;</a>
       )
     )}
   </nav>

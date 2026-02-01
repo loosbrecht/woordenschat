@@ -1,47 +1,39 @@
 import words from '../data/words.json';
 
 export interface Word {
+  date: string;
   word: string;
   explanation: string;
   example: string;
 }
 
-export interface WordEntry extends Word {
-  date: string;
-}
-
-const entries = words as WordEntry[];
-
-export function formatDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
-
-export function parseDate(dateStr: string): Date | null {
-  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return null;
-  const [, y, m, d] = match;
-  const date = new Date(Number(y), Number(m) - 1, Number(d));
-  if (
-    date.getFullYear() !== Number(y) ||
-    date.getMonth() !== Number(m) - 1 ||
-    date.getDate() !== Number(d)
-  ) {
-    return null;
-  }
-  return date;
-}
+// Pre-sorted by date ascending for index-based navigation
+const entries: Word[] = (words as Word[]).sort((a, b) => a.date.localeCompare(b.date));
 
 export function getToday(): string {
-  return formatDate(new Date());
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+export function isValidDate(dateStr: string): boolean {
+  const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+  const [, y, m, d] = match.map(Number);
+  const date = new Date(y, m - 1, d);
+  return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
+}
+
+export function isFutureDate(dateStr: string): boolean {
+  return dateStr > getToday();
+}
+
+export function isToday(dateStr: string): boolean {
+  return dateStr === getToday();
 }
 
 export function formatDisplayDate(dateStr: string): string {
-  const date = parseDate(dateStr);
-  if (!date) return dateStr;
-  return date.toLocaleDateString('nl-NL', {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('nl-NL', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -49,41 +41,24 @@ export function formatDisplayDate(dateStr: string): string {
   });
 }
 
-export function isFutureDate(dateStr: string): boolean {
-  const date = parseDate(dateStr);
-  if (!date) return false;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return date > today;
-}
-
-export function isToday(dateStr: string): boolean {
-  return dateStr === getToday();
-}
-
-export function getWordForDate(dateStr: string): WordEntry | null {
+export function getWordForDate(dateStr: string): Word | null {
   return entries.find((e) => e.date === dateStr) ?? null;
 }
 
-export function getRecentWords(count: number): WordEntry[] {
+export function getRecentWords(count: number): Word[] {
   const today = getToday();
-  return entries
-    .filter((e) => e.date <= today)
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, count);
+  return entries.filter((e) => e.date <= today).reverse().slice(0, count);
 }
 
 export function getPrevDate(dateStr: string): string | null {
-  const prev = entries
-    .filter((e) => e.date < dateStr)
-    .sort((a, b) => b.date.localeCompare(a.date));
-  return prev[0]?.date ?? null;
+  const i = entries.findIndex((e) => e.date === dateStr);
+  return i > 0 ? entries[i - 1].date : null;
 }
 
 export function getNextDate(dateStr: string): string | null {
   const today = getToday();
-  const next = entries
-    .filter((e) => e.date > dateStr && e.date <= today)
-    .sort((a, b) => a.date.localeCompare(b.date));
-  return next[0]?.date ?? null;
+  const i = entries.findIndex((e) => e.date === dateStr);
+  if (i < 0 || i >= entries.length - 1) return null;
+  const next = entries[i + 1];
+  return next.date <= today ? next.date : null;
 }
