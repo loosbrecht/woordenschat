@@ -4,14 +4,14 @@ import OpenAI from 'openai';
 export const POST: APIRoute = async ({ request }) => {
   const { secret, existingWords } = await request.json();
 
-  if (!secret || secret !== import.meta.env.GENERATE_SECRET) {
+  if (!secret || secret !== process.env.GENERATE_SECRET) {
     return new Response(JSON.stringify({ error: 'Ongeldig wachtwoord.' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
-  const apiKey = import.meta.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return new Response(JSON.stringify({ error: 'OPENAI_API_KEY is niet geconfigureerd.' }), {
       status: 500,

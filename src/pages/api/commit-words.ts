@@ -16,15 +16,15 @@ export const POST: APIRoute = async ({ request }) => {
     words: WordEntry[];
   };
 
-  if (!secret || secret !== import.meta.env.GENERATE_SECRET) {
+  if (!secret || secret !== process.env.GENERATE_SECRET) {
     return new Response(JSON.stringify({ error: 'Ongeldig wachtwoord.' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' },
     });
   }
 
-  const githubToken = import.meta.env.GITHUB_TOKEN;
-  const githubRepo = import.meta.env.GITHUB_REPO;
+  const githubToken = process.env.GITHUB_TOKEN;
+  const githubRepo = process.env.GITHUB_REPO;
 
   if (!githubToken || !githubRepo) {
     return new Response(
