@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import OpenAI from 'openai';
 
 export const POST: APIRoute = async ({ request }) => {
-  const { secret, existingWords } = await request.json();
+  const { secret, existingWords, aantal = 1 } = await request.json();
 
   if (!secret || secret !== process.env.GENERATE_SECRET) {
     return new Response(JSON.stringify({ error: 'Ongeldig wachtwoord.' }), {
@@ -21,64 +21,101 @@ export const POST: APIRoute = async ({ request }) => {
 
   const openai = new OpenAI({ apiKey });
   const wordList = (existingWords as string[]).join(', ');
+  const count = Math.max(1, Math.min(30, Number(aantal)));
 
   try {
-    // Generate a word
+    // Generate words
     const genResponse = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
+      temperature: 1.0,
       response_format: { type: 'json_object' },
       messages: [
         {
           role: 'system',
-          content: `Je bent een expert in het Vlaams (Belgisch-Nederlands). Genereer een interessant, minder bekend maar bruikbaar Vlaams woord met uitleg en voorbeeldzin. Het woord moet echt bestaan, mooi zijn, en iemands woordenschat verrijken. Het mag een typisch Vlaams woord zijn, een woord uit het Belgisch-Nederlands, of een woord dat vooral in Vlaanderen gebruikt wordt.
+          content: `Je bent een expert in het Nederlands met een Vlaamse voorkeur, gespecialiseerd in literair, intellectueel, academisch en juridisch taalgebruik.
 
-Vermijd deze woorden die al bestaan in de lijst: ${wordList}
+Genereer ${count} Nederlandse woorden die:
+- gevorderd en niet alledaags zijn
+- de woordenschat van een volwassen moedertaalspreker verrijken
+- voorkomen in literatuur, academische contexten of juridisch taalgebruik
+- algemeen Nederlands zijn, maar natuurlijk aanvoelen in Vlaanderen
 
-Antwoord in JSON-formaat: { "word": "...", "explanation": "...", "example": "..." }
-- "explanation": een heldere uitleg van het woord in het Vlaams/Belgisch-Nederlands
-- "example": een voorbeeldzin in het Vlaams die het woord correct gebruikt`,
+Vermijd expliciet:
+- banale of alledaagse woorden
+- typisch Noord-Nederlandse formuleringen
+- dialectwoorden of regionaal beperkte termen
+- anglicismen
+- woorden die al in deze lijst staan: ${wordList}
+
+Outputvereisten (zeer belangrijk):
+- Geef uitsluitend geldige JSON terug
+- Geen uitleg, geen markdown, geen tekst buiten JSON
+- De output is één JSON-object met een "words" key die een array bevat met exact ${count} objecten
+- Elk object volgt exact dit formaat:
+
+{
+  "word": "string",
+  "explanation": "string",
+  "example": "string"
+}
+
+Inhoudsregels:
+- De uitleg is precies, genuanceerd en in correct (Vlaams) Nederlands
+- Het voorbeeld is een inhoudelijk sterke, natuurlijke zin met een literair, academisch of juridisch register
+- Zorg voor variatie in woordsoort en betekenis`,
         },
         {
           role: 'user',
-          content: 'Genereer een mooi Vlaams woord.',
+          content: `Genereer ${count} gevorderde Nederlandse woorden.`,
         },
       ],
     });
 
-    const generated = JSON.parse(genResponse.choices[0].message.content!);
+    const genResult = JSON.parse(genResponse.choices[0].message.content!);
+    const generatedWords: Array<{ word: string; explanation: string; example: string }> =
+      Array.isArray(genResult) ? genResult : genResult.words;
 
-    // Verify the word independently
-    const verifyResponse = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      response_format: { type: 'json_object' },
-      messages: [
-        {
-          role: 'system',
-          content: `Je bent een strenge taalkundige met expertise in het Vlaams (Belgisch-Nederlands) die woorden controleert op juistheid.
+    // Verify each word independently
+    const verifiedWords = await Promise.all(
+      generatedWords.map(async (generated) => {
+        const verifyResponse = await openai.chat.completions.create({
+          model: 'gpt-4o',
+          temperature: 0.3,
+          response_format: { type: 'json_object' },
+          messages: [
+            {
+              role: 'system',
+              content: `Je bent een strenge taalkundige die woorden verifieert voor een Vlaamse woordenschat-app gericht op gevorderd Nederlands.
 
-Je krijgt een woord, uitleg en voorbeeldzin. Controleer:
-1. Is dit een echt woord dat in het Vlaams/Belgisch-Nederlands gebruikt wordt?
-2. Is de uitleg accuraat?
-3. Is de voorbeeldzin grammaticaal correct en wordt het woord juist gebruikt?
+Je krijgt een woord met uitleg en voorbeeldzin. Beoordeel op deze criteria:
 
-Antwoord in JSON-formaat: { "valid": true/false, "reason": "..." }`,
-        },
-        {
-          role: 'user',
-          content: JSON.stringify(generated),
-        },
-      ],
-    });
+1. BESTAAT HET WOORD? Het moet een echt, geattesteerd Nederlands woord zijn dat in Van Dale of vergelijkbare woordenboeken voorkomt. Samengestelde neologismen of verzinsels zijn ONGELDIG.
+2. IS HET GEVORDERD GENOEG? Banale of alledaagse woorden zijn ONGELDIG — het doel is de woordenschat van een volwassen moedertaalspreker te verrijken.
+3. IS DE UITLEG CORRECT EN BONDIG? De uitleg moet kloppen, genuanceerd zijn en in correct Nederlands.
+4. IS DE VOORBEELDZIN CORRECT? Grammaticaal correct, natuurlijk klinkend, en het woord wordt juist gebruikt in een literair, academisch of juridisch register.
 
-    const verification = JSON.parse(verifyResponse.choices[0].message.content!);
+Antwoord in JSON-formaat: { "valid": true/false, "reason": "..." }
+Wees streng. Bij twijfel: ongeldig.`,
+            },
+            {
+              role: 'user',
+              content: JSON.stringify(generated),
+            },
+          ],
+        });
+
+        const verification = JSON.parse(verifyResponse.choices[0].message.content!);
+        return {
+          word: generated.word,
+          explanation: generated.explanation,
+          example: generated.example,
+          verification,
+        };
+      })
+    );
 
     return new Response(
-      JSON.stringify({
-        word: generated.word,
-        explanation: generated.explanation,
-        example: generated.example,
-        verification,
-      }),
+      JSON.stringify({ words: verifiedWords }),
       {
         status: 200,
         headers: { 'Content-Type': 'application/json' },

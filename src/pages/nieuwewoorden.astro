@@ -123,53 +123,42 @@ const lastDate = [...words].sort((a, b) => a.date.localeCompare(b.date)).at(-1)?
       hideStatus(saveStatusEl);
 
       generateBtn.disabled = true;
+      showStatus(statusEl, `${count} woord${count !== 1 ? 'en' : ''} genereren...`);
 
-      let nextDate = lastDate;
+      try {
+        const res = await fetch('/api/generate-word', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ secret, existingWords: allExistingWords, aantal: count }),
+        });
 
-      for (let i = 0; i < count; i++) {
-        nextDate = addDays(nextDate, 1);
+        const data = await res.json();
 
-        // Skip dates that already have a word
-        while (allExistingWords.length > 0 && false) {
-          nextDate = addDays(nextDate, 1);
-        }
-
-        showStatus(statusEl, `Woord ${i + 1} van ${count} genereren voor ${nextDate}...`);
-
-        try {
-          const res = await fetch('/api/generate-word', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ secret, existingWords: allExistingWords }),
-          });
-
-          const data = await res.json();
-
-          if (!res.ok) {
-            showStatus(statusEl, data.error || 'Fout bij genereren.', 'error');
-            generateBtn.disabled = false;
-            return;
-          }
-
-          const entry = {
-            date: nextDate,
-            word: data.word,
-            explanation: data.explanation,
-            example: data.example,
-            verification: data.verification,
-          };
-
-          generatedWords.push(entry);
-          allExistingWords.push(data.word);
-          renderResults();
-        } catch (err) {
-          showStatus(statusEl, `Fout: ${err.message}`, 'error');
+        if (!res.ok) {
+          showStatus(statusEl, data.error || 'Fout bij genereren.', 'error');
           generateBtn.disabled = false;
           return;
         }
+
+        let nextDate = lastDate;
+        for (const item of data.words) {
+          nextDate = addDays(nextDate, 1);
+          generatedWords.push({
+            date: nextDate,
+            word: item.word,
+            explanation: item.explanation,
+            example: item.example,
+            verification: item.verification,
+          });
+          allExistingWords.push(item.word);
+        }
+
+        renderResults();
+        showStatus(statusEl, `${generatedWords.length} woord${generatedWords.length !== 1 ? 'en' : ''} gegenereerd.`, 'success');
+      } catch (err) {
+        showStatus(statusEl, `Fout: ${err.message}`, 'error');
       }
 
-      showStatus(statusEl, `${generatedWords.length} woord${generatedWords.length !== 1 ? 'en' : ''} gegenereerd.`, 'success');
       generateBtn.disabled = false;
     });
 

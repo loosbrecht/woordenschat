@@ -102,48 +102,78 @@ async function getOpenAI() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 }
 
-async function generateWord(openai, existingWords) {
+async function generateWords(openai, existingWords, aantal) {
   const wordList = existingWords.map((w) => w.word).join(', ');
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o',
+    temperature: 1.0,
     response_format: { type: 'json_object' },
     messages: [
       {
         role: 'system',
-        content: `Je bent een expert in het Vlaams (Belgisch-Nederlands). Genereer een interessant, minder bekend maar bruikbaar Vlaams woord met uitleg en voorbeeldzin. Het woord moet echt bestaan, mooi zijn, en iemands woordenschat verrijken. Het mag een typisch Vlaams woord zijn, een woord uit het Belgisch-Nederlands, of een woord dat vooral in Vlaanderen gebruikt wordt.
+        content: `Je bent een expert in het Nederlands met een Vlaamse voorkeur, gespecialiseerd in literair, intellectueel, academisch en juridisch taalgebruik.
 
-Vermijd deze woorden die al bestaan in de lijst: ${wordList}
+Genereer ${aantal} Nederlandse woorden die:
+- gevorderd en niet alledaags zijn
+- de woordenschat van een volwassen moedertaalspreker verrijken
+- voorkomen in literatuur, academische contexten of juridisch taalgebruik
+- algemeen Nederlands zijn, maar natuurlijk aanvoelen in Vlaanderen
 
-Antwoord in JSON-formaat: { "word": "...", "explanation": "...", "example": "..." }
-- "explanation": een heldere uitleg van het woord in het Vlaams/Belgisch-Nederlands
-- "example": een voorbeeldzin in het Vlaams die het woord correct gebruikt`,
+Vermijd expliciet:
+- banale of alledaagse woorden
+- typisch Noord-Nederlandse formuleringen
+- dialectwoorden of regionaal beperkte termen
+- anglicismen
+- woorden die al in deze lijst staan: ${wordList}
+
+Outputvereisten (zeer belangrijk):
+- Geef uitsluitend geldige JSON terug
+- Geen uitleg, geen markdown, geen tekst buiten JSON
+- De output is één JSON-object met een "words" key die een array bevat met exact ${aantal} objecten
+- Elk object volgt exact dit formaat:
+
+{
+  "word": "string",
+  "explanation": "string",
+  "example": "string"
+}
+
+Inhoudsregels:
+- De uitleg is precies, genuanceerd en in correct (Vlaams) Nederlands
+- Het voorbeeld is een inhoudelijk sterke, natuurlijke zin met een literair, academisch of juridisch register
+- Zorg voor variatie in woordsoort en betekenis`,
       },
       {
         role: 'user',
-        content: 'Genereer een mooi Vlaams woord.',
+        content: `Genereer ${aantal} gevorderde Nederlandse woorden.`,
       },
     ],
   });
 
-  return JSON.parse(response.choices[0].message.content);
+  const result = JSON.parse(response.choices[0].message.content);
+  return Array.isArray(result) ? result : result.words;
 }
 
 async function verifyWord(openai, word) {
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-4o',
+    temperature: 0.3,
     response_format: { type: 'json_object' },
     messages: [
       {
         role: 'system',
-        content: `Je bent een strenge taalkundige met expertise in het Vlaams (Belgisch-Nederlands) die woorden controleert op juistheid.
+        content: `Je bent een strenge taalkundige die woorden verifieert voor een Vlaamse woordenschat-app gericht op gevorderd Nederlands.
 
-Je krijgt een woord, uitleg en voorbeeldzin. Controleer:
-1. Is dit een echt woord dat in het Vlaams/Belgisch-Nederlands gebruikt wordt?
-2. Is de uitleg accuraat?
-3. Is de voorbeeldzin grammaticaal correct en wordt het woord juist gebruikt?
+Je krijgt een woord met uitleg en voorbeeldzin. Beoordeel op deze criteria:
 
-Antwoord in JSON-formaat: { "valid": true/false, "reason": "..." }`,
+1. BESTAAT HET WOORD? Het moet een echt, geattesteerd Nederlands woord zijn dat in Van Dale of vergelijkbare woordenboeken voorkomt. Samengestelde neologismen of verzinsels zijn ONGELDIG.
+2. IS HET GEVORDERD GENOEG? Banale of alledaagse woorden zijn ONGELDIG — het doel is de woordenschat van een volwassen moedertaalspreker te verrijken.
+3. IS DE UITLEG CORRECT EN BONDIG? De uitleg moet kloppen, genuanceerd zijn en in correct Nederlands.
+4. IS DE VOORBEELDZIN CORRECT? Grammaticaal correct, natuurlijk klinkend, en het woord wordt juist gebruikt in een literair, academisch of juridisch register.
+
+Antwoord in JSON-formaat: { "valid": true/false, "reason": "..." }
+Wees streng. Bij twijfel: ongeldig.`,
       },
       {
         role: 'user',
@@ -159,54 +189,54 @@ Antwoord in JSON-formaat: { "valid": true/false, "reason": "..." }`,
 // AI mode
 // ---------------------------------------------------------------------------
 
-async function aiGenerateOneWord(openai, existingWords, date, shouldValidate) {
-  const MAX_RETRIES = 3;
+async function aiGenerateWords(openai, existingWords, startDate, count, shouldValidate) {
+  console.log(`\nGenerating ${count} word${count !== 1 ? 's' : ''}...`);
 
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    console.log(`\nGenerating word for ${date}... (attempt ${attempt}/${MAX_RETRIES})`);
+  const generated = await generateWords(openai, existingWords, count);
+  console.log(`  Generated ${generated.length} word${generated.length !== 1 ? 's' : ''}.`);
 
-    const generated = await generateWord(openai, existingWords);
-    console.log(`  Word: ${generated.word}`);
-    console.log(`  Explanation: ${generated.explanation}`);
-    console.log(`  Example: ${generated.example}`);
+  const results = [];
+
+  for (let i = 0; i < generated.length; i++) {
+    const word = generated[i];
+    const date = i === 0 ? startDate : addDays(startDate, i);
+
+    console.log(`\n  [${i + 1}/${generated.length}] ${word.word} (${date})`);
+    console.log(`      Explanation: ${word.explanation}`);
+    console.log(`      Example: ${word.example}`);
 
     // Check for duplicates
-    if (existingWords.some((w) => w.word.toLowerCase() === generated.word.toLowerCase())) {
-      console.log('  -> Duplicate word, retrying...');
+    if (existingWords.some((w) => w.word.toLowerCase() === word.word.toLowerCase())) {
+      console.log('      -> Duplicate word, skipping.');
       continue;
     }
 
     // Verify with independent call
-    console.log('  Verifying...');
-    const verification = await verifyWord(openai, generated);
-    console.log(`  Verification: ${verification.valid ? 'VALID' : 'INVALID'} — ${verification.reason}`);
+    console.log('      Verifying...');
+    const verification = await verifyWord(openai, word);
+    console.log(`      Verification: ${verification.valid ? 'VALID' : 'INVALID'} — ${verification.reason}`);
 
     if (!verification.valid) {
-      console.log('  -> Verification failed, retrying...');
+      console.log('      -> Verification failed, skipping.');
       continue;
     }
 
     // If --validate, ask user for approval
     if (shouldValidate) {
       const rl = createRl();
-      const answer = await ask(rl, '  Add this word? (y/n/r): ');
+      const answer = await ask(rl, '      Add this word? (y/n): ');
       rl.close();
 
-      if (answer.toLowerCase() === 'n') {
-        console.log('  -> Skipped.');
-        return null;
-      }
-      if (answer.toLowerCase() === 'r') {
-        console.log('  -> Retrying with a new word...');
+      if (answer.toLowerCase() !== 'y') {
+        console.log('      -> Skipped.');
         continue;
       }
     }
 
-    return { date, ...generated };
+    results.push({ date, ...word });
   }
 
-  console.log(`  -> Failed after ${MAX_RETRIES} attempts, skipping date ${date}.`);
-  return null;
+  return results;
 }
 
 // ---------------------------------------------------------------------------
@@ -263,22 +293,26 @@ async function main() {
 
   let added = 0;
 
-  for (let i = 0; i < days; i++) {
-    const date = i === 0 ? nextDate : addDays(nextDate, i);
-    let entry;
-
-    if (aiMode) {
-      entry = await aiGenerateOneWord(openai, words, date, validate);
-    } else {
-      entry = await manualAddOneWord(words, date);
-    }
-
-    if (entry) {
+  if (aiMode) {
+    const entries = await aiGenerateWords(openai, words, nextDate, days, validate);
+    for (const entry of entries) {
       words.push(entry);
       words.sort((a, b) => a.date.localeCompare(b.date));
       await saveWords(words);
       console.log(`  -> Added "${entry.word}" for ${entry.date}`);
       added++;
+    }
+  } else {
+    for (let i = 0; i < days; i++) {
+      const date = i === 0 ? nextDate : addDays(nextDate, i);
+      const entry = await manualAddOneWord(words, date);
+      if (entry) {
+        words.push(entry);
+        words.sort((a, b) => a.date.localeCompare(b.date));
+        await saveWords(words);
+        console.log(`  -> Added "${entry.word}" for ${entry.date}`);
+        added++;
+      }
     }
   }
 
