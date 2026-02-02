@@ -11,17 +11,17 @@
     "explanation": "Een verlangend gevoel van gemis naar huis, een vertrouwde plek of een voorbije tijd.",
     "example": "Tijdens haar studie in het buitenland had ze soms last van heimwee naar haar familie."
   },
-  {
+   {
     "date": "2026-02-01",
-    "word": "fluisterwind",
-    "explanation": "Een heel zacht briesje dat nauwelijks voelbaar is, als een fluistering van de natuur.",
-    "example": "Een fluisterwind streek door de bladeren van de oude eikenboom in de tuin."
+    "word": "neveneffect",
+    "explanation": "Het woord 'neveneffect' verwijst naar een onbedoeld of bijkomend effect dat optreedt naast de beoogde werking van een actie of evenement. Het wordt vaak gebruikt in de context van medicijnen of beleidsmaatregelen, maar kan ook in bredere zin worden toegepast.",
+    "example": "Het nieuwe beleid had niet alleen de verwachte voordelen, maar ook enkele neveneffecten die we niet hadden voorzien."
   },
   {
     "date": "2026-02-02",
-    "word": "serendipiteit",
-    "explanation": "Het onverwacht ontdekken van iets moois of waardevols terwijl je naar iets anders op zoek bent.",
-    "example": "Door serendipiteit vond ze haar favoriete boek terwijl ze eigenlijk op zoek was naar een woordenboek."
+    "word": "jurisprudentie",
+    "explanation": "De verzameling van rechterlijke uitspraken waarin rechtsvragen worden behandeld en die dienen als richtlijn voor toekomstige gevallen.",
+    "example": "De advocaat verwees naar de jurisprudentie om zijn stelling te onderbouwen dat de wetgever de rechten van de beklaagde had geschonden."
   },
   {
     "date": "2026-02-03",
@@ -29,11 +29,11 @@
     "explanation": "Zachtmoedig verwijst naar een persoon die een rustige, milde en begripvolle aard heeft. Het duidt op iemand die zacht en vriendelijk van karakter is, vaak met een grote empathie voor anderen.",
     "example": "Haar zachtmoedige glimlach maakte meteen indruk op iedereen in de zaal."
   },
-  {
+   {
     "date": "2026-02-04",
-    "word": "flonkerend",
-    "explanation": "Flonkerend is een Vlaams woord dat verwijst naar iets dat fonkelt of glinstert, vaak in de context van lichtreflecties, of iets dat levendig en sprankelend is. Het wordt vaak gebruikt om de schoonheid en aantrekkelijkheid van iets te beschrijven, zoals sterren aan de hemel of de glans van een voorwerp.",
-    "example": "De flonkerende sterren aan de hemel maakten de nacht nog magischer tijdens onze wandeling."
+    "word": "ambiguïteit",
+    "explanation": "Een toestand waarin een uitdrukking, situatie of uitspraak twee of meer betekenissen heeft en dus voor dubbelzinnigheid kan zorgen.",
+    "example": "De ambiguïteit in zijn toespraak leidde tot uiteenlopende interpretaties bij het academische publiek."
   },
   {
     "date": "2026-02-05",
@@ -41,40 +41,11 @@
     "explanation": "Verbroedering is een term die verwijst naar het proces van het creëren van vriendschapsbanden, saamhorigheid en solidariteit tussen verschillende groepen of individuen. Het woord wordt vaak gebruikt in een sociale of culturele context, waar men probeert mensen samen te brengen om een gezamenlijke doel of begrip te bevorderen.",
     "example": "Tijdens het feest van de verbroedering kwamen buren samen om hun onderlinge relaties te versterken en het gemeenschapsgevoel te vieren."
   },
-  {
+ {
     "date": "2026-02-06",
-    "word": "plezierig",
-    "explanation": "Het woord 'plezierig' betekent iets dat vreugde of blijdschap brengt. In Vlaanderen wordt het vaak gebruikt om een spontane, positieve sfeer of een gezellige situatie aan te duiden.",
-    "example": "Het was een plezierige avond met vrienden, vol gelach en goede gesprekken."
-  },
-  {
-    "date": "2026-02-07",
-    "word": "neveneffect",
-    "explanation": "Het woord 'neveneffect' verwijst naar een onbedoeld of bijkomend effect dat optreedt naast de beoogde werking van een actie of evenement. Het wordt vaak gebruikt in de context van medicijnen of beleidsmaatregelen, maar kan ook in bredere zin worden toegepast.",
-    "example": "Het nieuwe beleid had niet alleen de verwachte voordelen, maar ook enkele neveneffecten die we niet hadden voorzien."
-  },
-  {
-    "date": "2026-02-08",
-    "word": "tobben",
-    "explanation": "Tobben betekent het eeuwig nadenken of piekeren over iets, vaak in de context van zorgen maken of twijfelen. Het heeft vaak een negatieve bijklank en kan duiden op een onzekere of veranderlijke gemoedstoestand.",
-    "example": "Zij zat de hele avond te tobben over haar toekomst, zonder tot een oplossing te komen."
-  },
-  {
-    "date": "2026-02-09",
-    "word": "ambiguïteit",
-    "explanation": "Een toestand waarin een uitdrukking, situatie of uitspraak twee of meer betekenissen heeft en dus voor dubbelzinnigheid kan zorgen.",
-    "example": "De ambiguïteit in zijn toespraak leidde tot uiteenlopende interpretaties bij het academische publiek."
-  },
-  {
-    "date": "2026-02-10",
     "word": "exegese",
     "explanation": "De kritische uitleg of interpretatie van een tekst, traditioneel toegepast op Bijbelse of religieuze teksten, maar ook bruikbaar in andere literaire of wetenschappelijke contexten.",
     "example": "In haar dissertatie voerde ze een grondige exegese uit van middeleeuwse manuscripten, wat nieuwe inzichten opleverde in de cultuurgeschiedenis van die periode."
-  },
-  {
-    "date": "2026-02-13",
-    "word": "jurisprudentie",
-    "explanation": "De verzameling van rechterlijke uitspraken waarin rechtsvragen worden behandeld en die dienen als richtlijn voor toekomstige gevallen.",
-    "example": "De advocaat verwees naar de jurisprudentie om zijn stelling te onderbouwen dat de wetgever de rechten van de beklaagde had geschonden."
   }
+
 ]
