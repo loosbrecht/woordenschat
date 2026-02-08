@@ -60,6 +60,12 @@
     "example": "De discrepantie tussen de beloofde resultaten en de daadwerkelijke uitkomsten van het onderzoek wekte wantrouwen bij de commissie."
   },
   {
+    "date": "2026-02-07",
+    "word": "antropomorfisme",
+    "explanation": "De toekenning van menselijke eigenschappen of vormen aan niet-menselijke wezens of objecten, vaak gebruikt in literatuur en kunst om dieren of goden te beschrijven.",
+    "example": "De dichter greep naar antropomorfisme om de rivier als een wijze oude man te beschrijven die al eeuwenlang fluisterend het verhaal van de vallei vertelde."
+  },
+  {
     "date": "2026-02-08",
     "word": "demagogie",
     "explanation": "Een manier van politieke retoriek die inspeelt op de gevoelens en vooroordelen van de massa om macht te verkrijgen.",
@@ -76,5 +82,17 @@
     "word": "precair",
     "explanation": "Een toestand die onzeker, instabiel of risico vol is en gemakkelijk kan verslechteren.",
     "example": "De sociaal-economische situatie in het land was dermate precair dat kleine veranderingen grote gevolgen konden hebben voor de kwetsbare groepen in de samenleving."
+  },
+  {
+    "date": "2026-02-10",
+    "word": "ontoerekeningsvatbaar",
+    "explanation": "Juridische term voor iemand die wegens een psychische aandoening niet verantwoordelijk gesteld kan worden voor zijn daden.",
+    "example": "De rechter verklaarde de beklaagde ontoerekeningsvatbaar en verwees hem naar een gespecialiseerde instelling voor behandeling."
+  },
+  {
+    "date": "2026-02-11",
+    "word": "metamorfose",
+    "explanation": "Een ingrijpende verandering in vorm, structuur of functie, vaak gebruikt om biologische processen of transformaties in literatuur te beschrijven.",
+    "example": "De roman beschrijft de geleidelijke metamorfose van de protagonist van een naïeve jongeling tot een wijze en doorleefde oude man."
   }
 ]
